@@ -16,10 +16,20 @@ RUN /tmp/build-llvm-native.sh
 COPY build-llvm-cross-aarch64.sh /tmp/build-llvm-cross-aarch64.sh
 RUN /tmp/build-llvm-cross-aarch64.sh
 
+COPY checkout-bpfcov.sh /tmp/checkout-bpfcov.sh
+RUN /tmp/checkout-bpfcov.sh
+
+COPY build-bpfcov-native.sh /tmp/build-bpfcov-native.sh
+RUN /tmp/build-bpfcov-native.sh
+
+COPY build-bpfcov-cross-aarch64.sh /tmp/build-bpfcov-cross-aarch64.sh
+RUN /tmp/build-bpfcov-cross-aarch64.sh
+
 FROM ${UBUNTU_IMAGE} as rootfs
 ARG TARGETPLATFORM
 
 COPY --from=builder /out/${TARGETPLATFORM}/bin /usr/local/bin
+COPY --from=builder /out/${TARGETPLATFORM}/lib /usr/local/lib
 COPY test /test/llvm
 
 FROM ${TESTER_IMAGE} as test
